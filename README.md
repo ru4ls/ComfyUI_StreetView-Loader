@@ -8,7 +8,7 @@ A custom node for ComfyUI that allows you to load images directly from Google St
 
 Instead of manually taking screenshots, this node programmatically fetches a clean, high-resolution image from any location on Earth with Street View coverage, giving you precise control over the camera angle, direction, and field of view.
 
-![Street View Loader Node combine with NanoBanana in ComfyUI](media/preview.png)
+![Street View Loader Node](media/preview.png)
 
 ---
 
@@ -22,27 +22,21 @@ This gives you the best of both worlds: the authenticity of a real photograph co
 
 ### Key Advantages & Use Cases
 
-*   **Guaranteed Location Accuracy:** When you need the background to be recognizably *your* street, a specific landmark, or a favorite travel spot, this node is the only way to guarantee a 100% accurate representation. The composition, architecture, and lighting are real, not AI-generated guesswork.
-
-*   **The Ultimate Base for `img2img` and ControlNet:** This is the most powerful use case. You can feed the real Street View image into your workflow as a base for:
-    *   **Stylization:** Keep the exact composition of a place while transforming it into an oil painting, an anime scene, or a charcoal sketch.
-    *   **Restoration/Re-imagining:** Take a view of an old neighborhood and use AI to add futuristic elements, or render it as it might have looked in a different historical period.
-    *   **Precise Inpainting:** Add characters, objects, or fantastical elements into a real-world scene with a background that is perfectly stable and coherent.
-
-*   **Virtual Location Scouting:** For concept artists, filmmakers, and game developers. You can instantly scout real-world locations from your desktop, pull them into ComfyUI, and experiment with different styles and moods for your project without ever leaving your chair.
-
-*   **Personalized and Sentimental Art:** Create a unique piece of art based on a place with personal meaning—a childhood home, a proposal spot, or a favorite vacation view. This creates a connection that a generic prompt could never achieve.
-
-*   **Consistent Backgrounds for Testing:** When testing LoRAs, IPAdapters, or character models, using a consistent, real-world background from this node ensures that you are only seeing the changes from your model, not the random variations of a `txt2img` background.
+*   **Guaranteed Location Accuracy:** When you need the background to be recognizably *your* street, a specific landmark, or a favorite travel spot, this node is the only way to guarantee a 100% accurate representation.
+*   **The Ultimate Base for ControlNet:** Feed the real Street View image into your workflow as a base for stylization (anime, oil painting), re-imagining (futuristic, historical), or precise inpainting.
+*   **Virtual Location Scouting:** Instantly scout real-world locations from your desktop and experiment with different styles and moods for your project.
+*   **Personalized & Sentimental Art:** Create unique art based on a place with personal meaning—a childhood home, a proposal spot, or a favorite vacation view.
+*   **Consistent Backgrounds for Testing:** Use a consistent, real-world background to reliably test LoRAs, IPAdapters, or character models.
 
 ![Street View Loader Node combine with NanoBanana in ComfyUI](media/preview_2.png)
 
 ## Features
 - **Direct API Integration:** Pulls images directly from the Google Street View Static API.
-- **Full Camera Control:** Adjust Location, Heading (pan), Pitch (tilt), and Field of View (zoom).
+- **Easy Workflow with URL Parser:** Just find a spot on Google Maps and paste the URL.
 - **Secure API Key Storage:** Uses a `.env` file to keep your API key safe and out of your workflow files.
+-   **Simple Aspect Ratio Presets:** Choose from common ratios like 16:9 or 1:1 without manual calculations.
 - **Clean Output:** No UI overlays, just the pure image.
-- **Easy Workflow Integration:** Outputs a standard `IMAGE` tensor and a metadata string (the fetch URL) for debugging.
+- **(Experimental) Panorama Mode:** Stitch multiple images together to create ultra-wide cinematic landscapes.
 
 ---
 
@@ -62,7 +56,7 @@ This gives you the best of both worlds: the authenticity of a real photograph co
     ```bash
     pip install -r requirements.txt
     ```
-    * this will install the `requests` and `python-dotenv` libraries, which are required for this node.*
+    *(This will install the `requests` and `python-dotenv` libraries required for the node to function.)*
 
 4.  **Restart ComfyUI.**
 
@@ -76,87 +70,79 @@ This node requires a Google Cloud API key to function. Google provides a generou
 
 **Part A: Create Project & Enable API**
 1.  Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2.  If you don't have a project, create one. If you do, click the project selector at the top and click **"New Project"**. Give it a name like `ComfyUI-API`.
-3.  Once the project is created, search for "API Library" in the top search bar.
-4.  In the library, search for and select **"Street View Static API"**.
-5.  Click the **"Enable"** button.
+2.  Create a **New Project**. Give it a name like `ComfyUI-API`.
+3.  In the new project, search for "API Library".
+4.  In the library, search for and **Enable** the **"Street View Static API"**.
 
 **Part B: Set Up Billing**
-6.  You will be prompted to link a billing account. This is required, but you will **not be charged** unless you exceed the $200 free monthly credit (equivalent to tens of thousands of image requests).
+5.  You will be prompted to link a billing account. This is required, but you will **not be charged** unless you exceed the $200 free monthly credit.
 
 **Part C: Create and Secure Your API Key**
-7.  In the Cloud Console search bar, navigate to **"Credentials"**.
-8.  Click **"+ Create Credentials"** and select **"API key"**.
-9.  Your new API key will be displayed. **Copy this key immediately.**
-10. **(IMPORTANT!)** Click the **"Edit API key"** button. Under "API restrictions," select **"Restrict key"**.
-11. In the dropdown, find and check **"Street View Static API"**, then click "OK". This ensures your key can *only* be used for this purpose, protecting your account. Click **"Save"**.
+6.  In the Cloud Console search bar, navigate to **"Credentials"**.
+7.  Click **"+ Create Credentials"** and select **"API key"**.
+8.  **Copy this key immediately.**
+9.  **(IMPORTANT!)** Click **"Edit API key"**. Under "API restrictions," select **"Restrict key"** and add **"Street View Static API"** to the list. This protects your account. Click **"Save"**.
 
 **Part D: Configure the Node**
-12. In your `ComfyUI/custom_nodes/ComfyUI_StreetView-Loader/` folder, create a new file named `.env`. or rename an existing `.env.example` file to `.env`.
-13. Open this `.env` file and add your copied API key in the following format:
+10. In your `ComfyUI/custom_nodes/ComfyUI_StreetView-Loader/` folder, create a new file named `.env` (or rename the existing `.env.example` file).
+11. Open this `.env` file and add your copied API key in the following format:
     ```
     GOOGLE_STREET_VIEW_API_KEY="your_actual_api_key_goes_here"
     ```
-14. Save the file.
-
-Your setup is now complete!
+12. Save the file. Your setup is now complete!
 
 ---
 
-## 3. How to Use
+## 3. How to Use & Upscaling
 
-1.  After restarting ComfyUI, double-click the canvas and search for **"Street View Loader"**.
-2.  The node will appear with several input fields.
+The recommended workflow is to use the **URL Parser** node to feed information into the **Loader** node.
 
-### Finding Your Parameters
+1.  **Find your view** in [Google Maps](https://maps.google.com) and enter Street View.
+2.  Frame the perfect shot, then **copy the entire URL** from your browser's address bar.
+3.  In ComfyUI, add the **`Street View URL Parser`** node and paste the URL into it.
+4.  Add the **`Street View Loader`** node.
+5.  Connect the outputs of the Parser to the inputs of the Loader (`location` to `location`, etc.).
 
-The best way to get the exact `location`, `heading`, `pitch`, and `fov` is to use the Google Maps URL.
+### Understanding the Nodes and Image Size Limit
 
-1.  Open [Google Maps](https://maps.google.com) and drop into Street View at your desired location.
-2.  Pan, tilt, and zoom the camera until you frame the perfect shot.
-3.  Look at the URL in your browser's address bar. It will look like this:
-    `https://www.google.com/maps/@**40.74844,-73.98566**,3a,**75**y,**273.99**h,**85.73**t/data=...`
+#### `Street View URL Parser`
+This node takes a full Google Maps URL as input and outputs the camera parameters (`location`, `heading`, `pitch`, `fov`).
 
-    -   `@**40.74844,-73.98566**`: This is the **`location`**.
-    -   `**75**y`: This is the **`fov`** (Field of View / Zoom).
-    -   `**273.99**h`: This is the **`heading`**.
-    -   `**85.73**t`: This is related to the **`pitch`**. The API uses a range of -90 (straight down) to +90 (straight up) with 0 being the horizon. A `t` value of `90` in the URL is roughly a `pitch` of `0` for the API. Adjust as needed.
-
-4.  Copy these values into the corresponding fields on the node and generate!
-
-### **The Easy Way: Using the URL Parser Node**
-
-As of version 2.0, the recommended workflow is to use the **Street View URL Parser** node. This node extracts all the camera parameters automatically from a single Google Maps URL.
-
-1.  Add two nodes to your workflow:
-    -   `Street View URL Parser` (found in `Ru4ls/StreetView/Utils`)
-    -   `Street View Loader`
-
-2.  Find the exact view you want in Google Street View on your browser.
-
-3.  Copy the **entire URL** from your browser's address bar.
-
-4.  Paste the URL into the `url` field of the **Parser** node.
-
-5.  Connect the outputs of the Parser node to the inputs of the Loader node (`location` to `location`, `heading` to `heading`, etc.).
-
-
-This method is faster, easier, and less error-prone than manually entering each parameter.
-
-### Node Inputs
-- `location`: The latitude and longitude (e.g., `40.74844,-73.98566`).
-- `heading`: The compass direction [0 to 360]. 0 is North, 90 is East, 180 is South, 270 is West.
-- `pitch`: The up/down tilt of the camera [-90 to 90]. 0 is the horizon.
-- `fov`: The field of view, or zoom [10 to 120]. A lower number is more zoomed in.
-- `width` / `height`: The dimensions of the output image (max 640x640 for the free API).
+#### `Street View Loader`
+This is the main node that fetches the image.
+-   **`aspect_ratio`**: Choose your desired output aspect ratio from the dropdown. This replaces manual width/height inputs.
+-   **API Limit & Upscaling:** The Google Street View API has a maximum output size of **640x640 pixels**. For high-resolution images (like 1080p or 4K), you **must** use an upscaling workflow.
+-   **Recommended HD Workflow:**
+    1.  Select `"16:9 Widescreen (640x360)"` in the `Street View Loader`.
+    2.  Connect its `IMAGE` output to an **`Upscale Image (using model)`** node.
+    3.  Use a `Load Upscale Model` node (e.g., `4x-UltraSharp`) to get a final, high-quality **2560x1440** image.
 
 ---
 
-## 4. Troubleshooting
+## 4. (Experimental) Panoramic Loader Node
 
--   **Node throws a `ValueError: API key not found`:** Your `.env` file is missing, in the wrong location, or the variable name is not `GOOGLE_STREET_VIEW_API_KEY`. It must be in the `ComfyUI_StreetView-Loader` folder.
--   **The node outputs a black image:** This almost always means Google has no Street View imagery for that exact coordinate, or the API key is invalid/restricted. Check your key's restrictions in the Google Cloud Console and try a slightly different coordinate. The `metadata` output will contain an error message.
--   **The node doesn't appear in ComfyUI:** Ensure you have fully restarted the ComfyUI server after installation.
+For users who need to create wide, cinematic landscapes, the project includes an experimental **Street View Pano Loader** node.
+
+![Street View Pano Loader Node](media/preview_3.png)
+
+### What It Does
+This node overcomes the API's FOV limitations by fetching multiple image "tiles" and stitching them side-by-side. For example, requesting **3 images** will result in three `640x640` images being stitched into a single `1920x640` image.
+
+### **⚠️ Important Experimental Notes:**
+
+-   **API Usage:** This node makes multiple API calls. A panorama with **3 images** will count as **3 requests** against your free monthly Google Cloud credit.
+-   **Simple Stitching:** This feature uses a basic side-by-side stitch and does not perform advanced perspective correction. It works best for distant landscapes where distortion is minimal.
+-   **Resolution:** The output image will be very wide but only 640px tall. It is highly recommended to chain the output of this node into an **Upscale Image** node.
+
+---
+
+## 5. Troubleshooting
+
+-   **`ValueError: API key not found`:** Your `.env` file is missing, in the wrong location, or the variable name is not `GOOGLE_STREET_VIEW_API_KEY`.
+-   **Black Image Output:** This usually means Google has no Street View imagery for that coordinate, or your API key is invalid/restricted. Check your key's restrictions on the Google Cloud Console.
+-   **Node not appearing in ComfyUI:** Ensure you have fully restarted the ComfyUI server after installation.
+
+---
 
 ## License
 
