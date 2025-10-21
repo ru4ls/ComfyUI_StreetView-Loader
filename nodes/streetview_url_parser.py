@@ -20,7 +20,7 @@ class StreetViewURLParser:
     RETURN_TYPES = ("STRING", "FLOAT", "FLOAT", "INT")
     RETURN_NAMES = ("location", "heading", "pitch", "fov")
     FUNCTION = "parse_url"
-    CATEGORY = "Ru4ls/StreetView/Utils" # A sub-category for utilities
+    CATEGORY = "Ru4ls/StreetView/Utils"
 
     def parse_url(self, url):
         # Default values in case parsing fails

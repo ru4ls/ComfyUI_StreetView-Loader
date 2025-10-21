@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 from PIL import Image
 
 # Import the refactored API call function from our utility file
-# No changes are needed in connect_api_utils.py
 from ..utils.connect_api_utils import fetch_streetview_image
 
 # --- Load API Key from .env file ---
@@ -44,7 +43,6 @@ class StreetViewLoader:
                 "heading": ("FLOAT", {"default": 151.78, "min": 0, "max": 360, "step": 0.1, "display": "slider"}),
                 "pitch": ("FLOAT", {"default": -0.76, "min": -90, "max": 90, "step": 0.1, "display": "slider"}),
                 "fov": ("INT", {"default": 90, "min": 10, "max": 120, "step": 1, "display": "slider"}),
-                # NEW: Aspect ratio dropdown replaces width/height inputs
                 "aspect_ratio": ([
                     "1:1 Square (640x640)", 
                     "16:9 Widescreen (640x360)", 
@@ -61,11 +59,11 @@ class StreetViewLoader:
     CATEGORY = "Ru4ls/StreetView"
 
     def load_image(self, location, heading, pitch, fov, aspect_ratio):
-        # The API key is now taken directly from the globally loaded variable.
+
         if not API_KEY_FROM_ENV:
             raise ValueError("Google Street View API key not found in .env file. Please ensure GOOGLE_STREET_VIEW_API_KEY is set in ComfyUI_StreetView-Loader/.env")
 
-        # NEW: Logic to determine width and height based on the selected aspect ratio
+        # Logic to determine width and height based on the selected aspect ratio
         if aspect_ratio == "1:1 Square (640x640)":
             width, height = 640, 640
         elif aspect_ratio == "16:9 Widescreen (640x360)":

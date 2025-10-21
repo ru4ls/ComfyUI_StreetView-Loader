@@ -1,2 +1,3 @@
 requests
+opencv-python
 python-dotenv

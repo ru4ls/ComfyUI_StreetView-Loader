@@ -119,22 +119,48 @@ This is the main node that fetches the image.
 
 ---
 
-## 4. (Experimental) Panoramic Loader Node
+## 4. Panoramic Loader Node
 
-For users who need to create wide, cinematic landscapes, the project includes an experimental **Street View Pano Loader** node.
+For users who need to create wide, cinematic landscapes, the project includes the **Street View Pano Loader** node.
 
-![Street View Pano Loader Node](media/preview_3.png)
+This node overcomes the API's FOV limitations by using a sophisticated stitching algorithm. It fetches multiple overlapping image "tiles" and then uses the OpenCV library to analyze, warp, and seamlessly blend them into a single, perspective-corrected panoramic image.
 
-### What It Does
-This node overcomes the API's FOV limitations by fetching multiple image "tiles" and stitching them side-by-side. For example, requesting **3 images** will result in three `640x640` images being stitched into a single `1920x640` image.
+![Street View Pano Loader Node in ComfyUI](media/preview_3-new.png)
 
-### **⚠️ Important Experimental Notes:**
+![Street View Pano Loader Node result](media/StreetView_Pano_00010_.png)
+
+### How to Use & Parameter Suggestions
+
+1.  Add the **"Street View Pano Loader"** node to your canvas.
+2.  Provide a `location` and `center_heading` (the direction you want the middle of your panorama to face).
+3.  Fine-tune the parameters for a successful stitch:
+    -   **`overlap_percentage`**: This is the most critical setting. For OpenCV to work, it needs to see the same features in adjacent images. An overlap of **30-50%** is a great starting point. **If a stitch fails, increase this value first.**
+    -   **`fov_per_image`**: A narrower Field of View (like 70-80) can reduce distortion at the edges of each tile, making it easier for the algorithm to find matching points. However, you may need to increase the `num_images` to capture the same total width.
+    -   **`num_images`**: Controls the final width of your panorama. Start with 3 and increase if needed.
+
+### Understanding the Output: Warping & Black Borders
+
+A successful, high-quality stitch will **not** be a perfect rectangle. To correctly align the perspectives, the stitcher "warps" the flat photos onto a virtual cylinder.
+
+**The curved edges and black borders are not an error; they are proof that the perspective correction worked!** This warped image is now a seamless, geometrically correct panorama, ready for refinement.
+
+### Refining Your Panorama: Optional Next Steps
+
+Once you have your stitched result, you have two great options to create a final, rectangular image:
+
+**1. Cropping (The Simple Method)**
+-   **Goal:** To get a clean, cinematic widescreen image.
+-   **How:** Connect the `IMAGE` output from the Pano Loader to a `Crop` node in ComfyUI. Adjust the crop box to frame the best part of the scene and remove the black areas.
+
+**2. AI Outpainting (The Advanced Method)**
+-   **Goal:** To use AI to intelligently fill in the missing areas, creating a larger, natural-looking scene.
+-   **How:** Feed the panoramic image into your main workflow (`VAE Encode`, `KSampler`, etc.) with a descriptive prompt of the scene and a **low denoise** (e.g., 0.3-0.5). The AI will use the existing pixels as a guide to generate new details in the black corners.
+
+### Important Notes
 
 -   **API Usage:** This node makes multiple API calls. A panorama with **3 images** will count as **3 requests** against your free monthly Google Cloud credit.
--   **Simple Stitching:** This feature uses a basic side-by-side stitch and does not perform advanced perspective correction. It works best for distant landscapes where distortion is minimal.
--   **Resolution:** The output image will be very wide but only 640px tall. It is highly recommended to chain the output of this node into an **Upscale Image** node.
-
----
+-   **Stitching Process:** If the OpenCV algorithm cannot find enough matching features, it will automatically **fall back to a simple side-by-side stitch** to ensure you always get an output. If this happens, the best solution is to increase the `overlap_percentage`.
+-   **Resolution:** The output image will be very wide but only 640px tall. It is **highly recommended** to chain the output of this node into an **Upscale Image** node to increase the final resolution for your projects.
 
 ## 5. Troubleshooting
 

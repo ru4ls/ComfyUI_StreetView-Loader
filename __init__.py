@@ -16,8 +16,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StreetViewPanoLoader": "Street View Pano Loader",
 }
 
-__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
-
 print("------------------------------------------")
 print("ComfyUI Street View Loader Node: Loaded.")
 print("------------------------------------------")
