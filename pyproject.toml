@@ -1,6 +1,6 @@
 [project]
-name = "streetview-loader"
-description = "A custom node for ComfyUI that allows you to load images directly from Google Street View to use as backgrounds, textures, or inputs in your workflows."
+name = "comfyui-streetview-loader"
+description = "A custom node for ComfyUI that allows you to load images directly from Google Street View using Google Street Static API to use as backgrounds, textures, or inputs in your workflows."
 version = "1.0.0"
 license = {file = "LICENSE"} 
 # classifiers = [
@@ -25,13 +25,13 @@ dependencies = ["requests", "opencv-python", "python-dotenv"]
 [project.urls]
 Repository = "https://github.com/ru4ls/ComfyUI_StreetView-Loader"
 #  Used by Comfy Registry https://registry.comfy.org
-Documentation = "https://github.com/ru4ls/ComfyUI_StreetView-Loader/wiki"
-"Bug Tracker" = "https://github.com/ru4ls/ComfyUI_StreetView-Loader/issues"
+# Documentation = "https://github.com/ru4ls/ComfyUI_StreetView-Loader/wiki"
+# "Bug Tracker" = "https://github.com/ru4ls/ComfyUI_StreetView-Loader/issues"
 
 [tool.comfy]
-PublisherId = ""
+PublisherId = "ruals"
 DisplayName = "ComfyUI_StreetView-Loader"
-Icon = ""
-includes = [] 
+Icon = "https://avatars.githubusercontent.com/u/126259521?v=4"
+# includes = [] 
 # "requires-comfyui" = ">=1.0.0"  # ComfyUI version compatibility
 
