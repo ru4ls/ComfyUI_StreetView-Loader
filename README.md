@@ -2,9 +2,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
+[![Version: v1.01](https://img.shields.io/badge/Version-v1.01-green.svg)](https://github.com/ru4ls/ComfyUI_StreetView-Loader)
 
-
-A custom node for ComfyUI that allows you to load images directly from Google Street View to use as backgrounds, textures, or inputs in your workflows.
+A custom node for ComfyUI that allows you to load images directly from Google Street View to use as backgrounds, textures, or inputs in your workflows. Version 1.01 adds animation capabilities!
 
 Instead of manually taking screenshots, this node programmatically fetches a clean, high-resolution image from any location on Earth with Street View coverage, giving you precise control over the camera angle, direction, and field of view.
 
@@ -27,6 +27,7 @@ This gives you the best of both worlds: the authenticity of a real photograph co
 *   **Virtual Location Scouting:** Instantly scout real-world locations from your desktop and experiment with different styles and moods for your project.
 *   **Personalized & Sentimental Art:** Create unique art based on a place with personal meaning—a childhood home, a proposal spot, or a favorite vacation view.
 *   **Consistent Backgrounds for Testing:** Use a consistent, real-world background to reliably test LoRAs, IPAdapters, or character models.
+*   **Animation Capabilities:** Create smooth camera movements and parameter transitions with the new Street View Animator node (v1.01).
 
 ![Street View Loader Node combine with NanoBanana in ComfyUI](media/preview_2.png)
 
@@ -37,6 +38,7 @@ This gives you the best of both worlds: the authenticity of a real photograph co
 -   **Simple Aspect Ratio Presets:** Choose from common ratios like 16:9 or 1:1 without manual calculations.
 - **Clean Output:** No UI overlays, just the pure image.
 - **(Experimental) Panorama Mode:** Stitch multiple images together to create ultra-wide cinematic landscapes.
+- **(New in v1.01) Animation Mode:** Animate camera parameters over time to create smooth transitions and camera movements.
 
 ---
 
@@ -162,7 +164,54 @@ Once you have your stitched result, you have two great options to create a final
 -   **Stitching Process:** If the OpenCV algorithm cannot find enough matching features, it will automatically **fall back to a simple side-by-side stitch** to ensure you always get an output. If this happens, the best solution is to increase the `overlap_percentage`.
 -   **Resolution:** The output image will be very wide but only 640px tall. It is **highly recommended** to chain the output of this node into an **Upscale Image** node to increase the final resolution for your projects.
 
-## 5. Troubleshooting
+## 5. Animation Node (New in v1.01)
+
+Version 1.01 introduces the **Street View Animator** node, which allows you to create animated sequences by smoothly transitioning camera parameters over time.
+
+This node enables you to create dynamic camera movements like slow rotations, pitch changes, or field-of-view adjustments that can be used as input for video generation workflows or simply to create smooth transitions between different viewpoints of the same location.
+
+![Street View Animator Node in ComfyUI](media/StreetView_Animate.png)
+
+<video src="https://github.com/user-attachments/assets/80346b4a-6c77-4f3e-b198-3ae6d846505b" width="100%" height="auto" controls></video>
+
+### How to Use & Parameter Suggestions
+
+1.  Add the **"Street View Animator"** node to your canvas.
+2.  Provide a `location` (same as other nodes).
+3.  Set your animation parameters:
+    -   **Start/End Values:** Define the beginning and ending values for `heading`, `pitch`, and `fov` parameters.
+    -   **Duration & FPS:** Control the total animation length and frame rate (frames per second).
+    -   **Interpolation:** Choose from different transition types (linear, ease-in, ease-out, ease-in-out) for smooth camera movements.
+    -   **aspect_ratio:** Select your desired output aspect ratio.
+
+4.  The node will generate a sequence of images as a stacked tensor output, which can be used for:
+    -   Video generation workflows
+    -   Frame-by-frame processing
+    -   Creating dynamic backgrounds for animations
+
+### Key Animation Parameters
+
+-   **Start/End Heading:** Control camera rotation from start to end values (0-360 degrees)
+-   **Start/End Pitch:** Adjust camera tilt from start to end values (-90 to 90 degrees) 
+-   **Start/End FOV:** Change field of view from start to end values (10-120 degrees)
+-   **Duration:** Total animation time in seconds
+-   **FPS:** Frames per second - determines smoothness and total frame count
+-   **Interpolation:** Defines how values transition between start and end points
+
+### Animation Tips
+
+-   **Smooth Rotations:** For a full 360° rotation, set start_heading=0 and end_heading=360
+-   **Camera Dolly:** Keep heading constant but change fov for zoom effects
+-   **Tilt Effects:** Combine pitch changes with heading changes for dynamic camera movements
+-   **Frame Count:** Total frames = duration × fps (higher values = smoother but may increase API usage costs)
+
+### Important Notes
+
+-   **API Usage:** This node makes multiple API calls equal to the total number of frames generated. Each frame is a separate API request.
+-   **Performance:** Animation rendering time increases with duration and fps. Start with low settings and increase as needed.
+-   **Memory:** Large frame sequences can consume significant memory. Consider using in smaller batches if needed.
+
+## 6. Troubleshooting
 
 -   **`ValueError: API key not found`:** Your `.env` file is missing, in the wrong location, or the variable name is not `GOOGLE_STREET_VIEW_API_KEY`.
 -   **Black Image Output:** This usually means Google has no Street View imagery for that coordinate, or your API key is invalid/restricted. Check your key's restrictions on the Google Cloud Console.
