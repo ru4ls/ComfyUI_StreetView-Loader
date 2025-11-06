@@ -172,7 +172,9 @@ This node enables you to create dynamic camera movements like slow rotations, pi
 
 ![Street View Animator Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/StreetView_Animate.png)
 
-<video src="https://raw.githubusercontent.com/ru4ls/ru4ls-public-media/main/comfyui-streetview-loader/video/ComfyUI%20StreetView%20Loader%20-%20Street%20View%20Animator.mp4" width="100%" height="auto" controls="true"></video>
+
+https://github.com/user-attachments/assets/7edbbdf8-2dcd-4e0c-aae0-ccc5ad1be679
+
 
 ### How to Use & Parameter Suggestions
 
