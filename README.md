@@ -8,7 +8,7 @@ A custom node for ComfyUI that allows you to load images directly from Google St
 
 Instead of manually taking screenshots, this node programmatically fetches a clean, high-resolution image from any location on Earth with Street View coverage, giving you precise control over the camera angle, direction, and field of view.
 
-![Street View Loader Node](media/preview.png)
+![Street View Loader Node](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/preview.png)
 
 ---
 
@@ -29,7 +29,7 @@ This gives you the best of both worlds: the authenticity of a real photograph co
 *   **Consistent Backgrounds for Testing:** Use a consistent, real-world background to reliably test LoRAs, IPAdapters, or character models.
 *   **Animation Capabilities:** Create smooth camera movements and parameter transitions with the new Street View Animator node (v1.01).
 
-![Street View Loader Node combine with NanoBanana in ComfyUI](media/preview_2.png)
+![Street View Loader Node combine with NanoBanana in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/preview_2.png)
 
 ## Features
 - **Direct API Integration:** Pulls images directly from the Google Street View Static API.
@@ -37,7 +37,7 @@ This gives you the best of both worlds: the authenticity of a real photograph co
 - **Secure API Key Storage:** Uses a `.env` file to keep your API key safe and out of your workflow files.
 -   **Simple Aspect Ratio Presets:** Choose from common ratios like 16:9 or 1:1 without manual calculations.
 - **Clean Output:** No UI overlays, just the pure image.
-- **(Experimental) Panorama Mode:** Stitch multiple images together to create ultra-wide cinematic landscapes.
+- **Panorama Mode:** Stitch multiple images together to create ultra-wide cinematic landscapes.
 - **(New in v1.01) Animation Mode:** Animate camera parameters over time to create smooth transitions and camera movements.
 
 ---
@@ -127,9 +127,9 @@ For users who need to create wide, cinematic landscapes, the project includes th
 
 This node overcomes the API's FOV limitations by using a sophisticated stitching algorithm. It fetches multiple overlapping image "tiles" and then uses the OpenCV library to analyze, warp, and seamlessly blend them into a single, perspective-corrected panoramic image.
 
-![Street View Pano Loader Node in ComfyUI](media/preview_3-new.png)
+![Street View Pano Loader Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/preview_3-new.png)
 
-![Street View Pano Loader Node result](media/StreetView_Pano_00010_.png)
+![Street View Pano Loader Node result](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/StreetView_Pano_00010_.png)
 
 ### How to Use & Parameter Suggestions
 
@@ -170,11 +170,9 @@ Version 1.01 introduces the **Street View Animator** node, which allows you to c
 
 This node enables you to create dynamic camera movements like slow rotations, pitch changes, or field-of-view adjustments that can be used as input for video generation workflows or simply to create smooth transitions between different viewpoints of the same location.
 
-![Street View Animator Node in ComfyUI](media/StreetView_Animate.png)
+![Street View Animator Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/StreetView_Animate.png)
 
-<video src="https://github.com/user-attachments/assets/1614f717-3951-423a-b0f7-9bcb6cc13359" width="100%" height="auto" controls></video>
-
-<video src="https://github.com/user-attachments/assets/80346b4a-6c77-4f3e-b198-3ae6d846505b" width="100%" height="auto" controls></video>
+<video src="https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/video/ComfyUI%20StreetView%20Loader%20v1.0.1%20update%20-%20Street%20View%20Animator.mp4" width="100%" height="auto" controls></video>
 
 
 ### How to Use & Parameter Suggestions
