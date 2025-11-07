@@ -39,6 +39,7 @@ This gives you the best of both worlds: the authenticity of a real photograph co
 - **Clean Output:** No UI overlays, just the pure image.
 - **Panorama Mode:** Stitch multiple images together to create ultra-wide cinematic landscapes.
 - **(New in v1.01) Animation Mode:** Animate camera parameters over time to create smooth transitions and camera movements.
+- **(New in v1.02) Cubemap Mode:** Generate 3D environment maps with six images representing all directions (front, back, left, right, up, down) for use in 3D applications and game engines.
 
 ---
 
@@ -70,23 +71,19 @@ This node requires a Google Cloud API key to function. Google provides a generou
 
 ### Step-by-Step Guide
 
-**Part A: Create Project & Enable API**
-1.  Go to the [Google Cloud Console](https://console.cloud.google.com/).
+1.  **Create Project & Enable API**: Go to the [Google Cloud Console](https://console.cloud.google.com).
 2.  Create a **New Project**. Give it a name like `ComfyUI-API`.
 3.  In the new project, search for "API Library".
 4.  In the library, search for and **Enable** the **"Street View Static API"**.
 
-**Part B: Set Up Billing**
-5.  You will be prompted to link a billing account. This is required, but you will **not be charged** unless you exceed the $200 free monthly credit.
+5.  **Set Up Billing**: You will be prompted to link a billing account. This is required, but you will **not be charged** unless you exceed the $200 free monthly credit.
 
-**Part C: Create and Secure Your API Key**
-6.  In the Cloud Console search bar, navigate to **"Credentials"**.
+6.  **Create and Secure Your API Key**: In the Cloud Console search bar, navigate to **"Credentials"**.
 7.  Click **"+ Create Credentials"** and select **"API key"**.
 8.  **Copy this key immediately.**
 9.  **(IMPORTANT!)** Click **"Edit API key"**. Under "API restrictions," select **"Restrict key"** and add **"Street View Static API"** to the list. This protects your account. Click **"Save"**.
 
-**Part D: Configure the Node**
-10. In your `ComfyUI/custom_nodes/ComfyUI_StreetView-Loader/` folder, create a new file named `.env` (or rename the existing `.env.example` file).
+10. **Configure the Node**: In your `ComfyUI/custom_nodes/ComfyUI_StreetView-Loader/` folder, create a new file named `.env` (or rename the existing `.env.example` file).
 11. Open this `.env` file and add your copied API key in the following format:
     ```
     GOOGLE_STREET_VIEW_API_KEY="your_actual_api_key_goes_here"
@@ -95,22 +92,24 @@ This node requires a Google Cloud API key to function. Google provides a generou
 
 ---
 
-## 3. How to Use & Upscaling
+## 3. How to Use & Workflow
 
-The recommended workflow is to use the **URL Parser** node to feed information into the **Loader** node.
+The recommended workflow is to use the **URL Parser** node to feed information into the other nodes.
 
 1.  **Find your view** in [Google Maps](https://maps.google.com) and enter Street View.
 2.  Frame the perfect shot, then **copy the entire URL** from your browser's address bar.
 3.  In ComfyUI, add the **`Street View URL Parser`** node and paste the URL into it.
-4.  Add the **`Street View Loader`** node.
-5.  Connect the outputs of the Parser to the inputs of the Loader (`location` to `location`, etc.).
+4.  Add one of the loader nodes.
+5.  Connect the outputs of the Parser to the inputs of the loader (`location` to `location`, etc.).
 
-### Understanding the Nodes and Image Size Limit
+---
 
-#### `Street View URL Parser`
+### Node Descriptions
+
+**`Street View URL Parser`**
 This node takes a full Google Maps URL as input and outputs the camera parameters (`location`, `heading`, `pitch`, `fov`).
 
-#### `Street View Loader`
+**`Street View Loader`**
 This is the main node that fetches the image.
 -   **`aspect_ratio`**: Choose your desired output aspect ratio from the dropdown. This replaces manual width/height inputs.
 -   **API Limit & Upscaling:** The Google Street View API has a maximum output size of **640x640 pixels**. For high-resolution images (like 1080p or 4K), you **must** use an upscaling workflow.
@@ -119,10 +118,7 @@ This is the main node that fetches the image.
     2.  Connect its `IMAGE` output to an **`Upscale Image (using model)`** node.
     3.  Use a `Load Upscale Model` node (e.g., `4x-UltraSharp`) to get a final, high-quality **2560x1440** image.
 
----
-
-## 4. Panoramic Loader Node
-
+**`Street View Pano Loader`**
 For users who need to create wide, cinematic landscapes, the project includes the **Street View Pano Loader** node.
 
 This node overcomes the API's FOV limitations by using a sophisticated stitching algorithm. It fetches multiple overlapping image "tiles" and then uses the OpenCV library to analyze, warp, and seamlessly blend them into a single, perspective-corrected panoramic image.
@@ -158,14 +154,7 @@ Once you have your stitched result, you have two great options to create a final
 -   **Goal:** To use AI to intelligently fill in the missing areas, creating a larger, natural-looking scene.
 -   **How:** Feed the panoramic image into your main workflow (`VAE Encode`, `KSampler`, etc.) with a descriptive prompt of the scene and a **low denoise** (e.g., 0.3-0.5). The AI will use the existing pixels as a guide to generate new details in the black corners.
 
-### Important Notes
-
--   **API Usage:** This node makes multiple API calls. A panorama with **3 images** will count as **3 requests** against your free monthly Google Cloud credit.
--   **Stitching Process:** If the OpenCV algorithm cannot find enough matching features, it will automatically **fall back to a simple side-by-side stitch** to ensure you always get an output. If this happens, the best solution is to increase the `overlap_percentage`.
--   **Resolution:** The output image will be very wide but only 640px tall. It is **highly recommended** to chain the output of this node into an **Upscale Image** node to increase the final resolution for your projects.
-
-## 5. Animation Node (New in v1.01)
-
+**`Street View Animator`** (New in v1.01)
 Version 1.01 introduces the **Street View Animator** node, which allows you to create animated sequences by smoothly transitioning camera parameters over time.
 
 This node enables you to create dynamic camera movements like slow rotations, pitch changes, or field-of-view adjustments that can be used as input for video generation workflows or simply to create smooth transitions between different viewpoints of the same location.
@@ -207,13 +196,62 @@ https://github.com/user-attachments/assets/7edbbdf8-2dcd-4e0c-aae0-ccc5ad1be679
 -   **Tilt Effects:** Combine pitch changes with heading changes for dynamic camera movements
 -   **Frame Count:** Total frames = duration × fps (higher values = smoother but may increase API usage costs)
 
+**`Street View Cubemap Loader`** (New in v1.02)
+Version 1.02 introduces the **Street View Cubemap Loader** node, which enables the generation of 3D environment maps from Street View locations. This node fetches six images at specific orientations to create a complete cubemap suitable for 3D applications and environment mapping in game engines or rendering software.
+
+
+![Street View Cubemap Loader Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/StreetView_cubemap.png)
+
+### How to Use & Parameter Suggestions
+
+1.  Add the **"Street View Cubemap Loader"** node to your canvas.
+2.  Provide a `location` (same as other nodes) for the center point of your environment map.
+3.  Adjust the parameters as needed:
+    -   **`face_resolution`**: Select the resolution for each of the 6 cubemap faces. Options include 256x256, 512x512, 640x640, and 1024x1024. Higher resolutions provide better quality but require more API requests and resources.
+    -   **`output_mode`**: Choose how to output the cubemap faces:
+        - **individual_faces**: Outputs six separate image tensors (front, back, left, right, up, down)
+        - **merged_cross**: Combines all faces into a single cross-shaped layout texture
+        - **merged_hstrip**: Combines all faces into a horizontal strip layout
+        - **merged_vstrip**: Combines all faces into a vertical strip layout
+
+
+4.  The node will generate outputs based on the selected output mode:
+    -   **Individual faces** (when selected): Six separate image outputs representing the six faces of the cube map:
+        -   **Front**: The view facing forward from the location (0° heading, 0° pitch)
+        -   **Back**: The view facing backward from the location (180° heading, 0° pitch)
+        -   **Left**: The view facing left from the location (270° heading, 0° pitch)
+        -   **Right**: The view facing right from the location (90° heading, 0° pitch)
+        -   **Up**: The view looking upward from the location (0° heading, 85° pitch) - note slightly less than 90° to work with API limitations
+        -   **Down**: The view looking downward from the location (0° heading, -85° pitch) - note slightly less than -90° to work with API limitations
+    -   **Merged texture** (when selected): A single image tensor containing all six faces arranged according to the selected layout
+
+![Street View Cubemap Merged Hstrip Loader Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/StreetView_cubemap-Hstrip.png)
+
+![Street View Cubemap Merged Hstrip Loader Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/StreetView_cubemap-Vstrip.png)
+
+### Use Cases for Cubemap Output
+
+- **3D Environment Mapping**: Use the cubemap output as an environment map for 3D scenes in Blender, Unity, or Unreal Engine
+- **Background Texturing**: Create realistic backgrounds for 3D scenes with accurate real-world lighting information
+- **VR Applications**: Generate real-world environments for virtual reality experiences
+- **Reflection Probes**: Use in rendering pipelines for accurate reflections and lighting calculations
+- **Easy 3D Integration**: The merged output modes make it simple to use cubemaps directly in 3D engines without manual texture assembly
+
 ### Important Notes
 
--   **API Usage:** This node makes multiple API calls equal to the total number of frames generated. Each frame is a separate API request.
--   **Performance:** Animation rendering time increases with duration and fps. Start with low settings and increase as needed.
--   **Memory:** Large frame sequences can consume significant memory. Consider using in smaller batches if needed.
+- **API Usage**: This node makes six API calls (one for each face of the cube). Each cubemap generation will count as **6 requests** against your free monthly Google Cloud credit.
+- **API Limitations**: The Street View API might not return valid images for extreme pitch angles. The node uses 85° and -85° for the up and down faces to avoid common API limitations at exactly 90° vertical pitch.
+- **Resolution Constraints**: Each face will be limited by the Street View API's maximum output size of 640x640 pixels. For higher resolutions, you'll need to upscale the results using ComfyUI's upscaling nodes after generation.
+- **Memory Considerations**: The merged output modes will create larger textures (e.g., cross layout is 4x width by 3x height of individual faces) so consider your system's memory limitations when choosing high resolutions.
 
-## 6. Troubleshooting
+### Important Notes for All Nodes
+
+-   **API Usage:** All nodes make API requests against your Google Cloud monthly credit.
+-   **API Limitations:** The Street View API may not have coverage for all locations or may return black images for extreme angles or unavailable locations.
+-   **Resolution Constraints:** The maximum resolution from the API is 640x640 pixels per image. For higher-resolution results, use ComfyUI's upscaling nodes.
+
+
+## 7. Troubleshooting
 
 -   **`ValueError: API key not found`:** Your `.env` file is missing, in the wrong location, or the variable name is not `GOOGLE_STREET_VIEW_API_KEY`.
 -   **Black Image Output:** This usually means Google has no Street View imagery for that coordinate, or your API key is invalid/restricted. Check your key's restrictions on the Google Cloud Console.

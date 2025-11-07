@@ -4,12 +4,14 @@ from .nodes.streetview_loader import StreetViewLoader
 from .nodes.streetview_url_parser import StreetViewURLParser
 from .nodes.streetview_pano_loader import StreetViewPanoLoader
 from .nodes.streetview_animator import StreetViewAnimator
+from .nodes.streetview_cubemap_loader import StreetViewCubemapLoader
 
 NODE_CLASS_MAPPINGS = {
     "StreetViewLoader": StreetViewLoader,
     "StreetViewURLParser": StreetViewURLParser,
     "StreetViewPanoLoader": StreetViewPanoLoader,
     "StreetViewAnimator": StreetViewAnimator,
+    "StreetViewCubemapLoader": StreetViewCubemapLoader,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -17,6 +19,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StreetViewURLParser": "Street View URL Parser",
     "StreetViewPanoLoader": "Street View Pano Loader",
     "StreetViewAnimator": "Street View Animator",
+    "StreetViewCubemapLoader": "Street View Cubemap Loader",
 }
 
 print("------------------------------------------")
