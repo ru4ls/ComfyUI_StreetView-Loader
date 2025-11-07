@@ -106,7 +106,8 @@ The recommended workflow is to use the **URL Parser** node to feed information i
 
 ### Node Descriptions
 
-**`Street View URL Parser`**
+## Street View URL Parser
+
 This node takes a full Google Maps URL as input and outputs the camera parameters (`location`, `heading`, `pitch`, `fov`).
 
 **`Street View Loader`**
@@ -118,7 +119,8 @@ This is the main node that fetches the image.
     2.  Connect its `IMAGE` output to an **`Upscale Image (using model)`** node.
     3.  Use a `Load Upscale Model` node (e.g., `4x-UltraSharp`) to get a final, high-quality **2560x1440** image.
 
-**`Street View Pano Loader`**
+## Street View Pano Loader
+
 For users who need to create wide, cinematic landscapes, the project includes the **Street View Pano Loader** node.
 
 This node overcomes the API's FOV limitations by using a sophisticated stitching algorithm. It fetches multiple overlapping image "tiles" and then uses the OpenCV library to analyze, warp, and seamlessly blend them into a single, perspective-corrected panoramic image.
@@ -154,8 +156,9 @@ Once you have your stitched result, you have two great options to create a final
 -   **Goal:** To use AI to intelligently fill in the missing areas, creating a larger, natural-looking scene.
 -   **How:** Feed the panoramic image into your main workflow (`VAE Encode`, `KSampler`, etc.) with a descriptive prompt of the scene and a **low denoise** (e.g., 0.3-0.5). The AI will use the existing pixels as a guide to generate new details in the black corners.
 
-**`Street View Animator`** (New in v1.01)
-Version 1.01 introduces the **Street View Animator** node, which allows you to create animated sequences by smoothly transitioning camera parameters over time.
+## Street View Animator (v1.0.1)
+
+Version 1.0.1 introduces the **Street View Animator** node, which allows you to create animated sequences by smoothly transitioning camera parameters over time.
 
 This node enables you to create dynamic camera movements like slow rotations, pitch changes, or field-of-view adjustments that can be used as input for video generation workflows or simply to create smooth transitions between different viewpoints of the same location.
 
@@ -196,7 +199,8 @@ https://github.com/user-attachments/assets/7edbbdf8-2dcd-4e0c-aae0-ccc5ad1be679
 -   **Tilt Effects:** Combine pitch changes with heading changes for dynamic camera movements
 -   **Frame Count:** Total frames = duration × fps (higher values = smoother but may increase API usage costs)
 
-**`Street View Cubemap Loader`** (New in v1.02)
+## Street View Cubemap Loader (v1.0.2)
+
 Version 1.02 introduces the **Street View Cubemap Loader** node, which enables the generation of 3D environment maps from Street View locations. This node fetches six images at specific orientations to create a complete cubemap suitable for 3D applications and environment mapping in game engines or rendering software.
 
 
