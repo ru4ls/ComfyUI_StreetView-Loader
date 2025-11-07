@@ -209,6 +209,9 @@ Version 1.02 introduces the **Street View Cubemap Loader** node, which enables t
 
 ![Street View Cubemap Merged Hstrip Loader Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/Streetview_cubemap_vstrip.png)
 
+https://github.com/user-attachments/assets/8f9b3771-ee5d-449a-97fe-b884d33b950b
+
+
 ### How to Use & Parameter Suggestions
 
 1.  Add the **"Street View Cubemap Loader"** node to your canvas.
