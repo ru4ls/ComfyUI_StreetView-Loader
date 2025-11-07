@@ -203,8 +203,11 @@ https://github.com/user-attachments/assets/7edbbdf8-2dcd-4e0c-aae0-ccc5ad1be679
 
 Version 1.02 introduces the **Street View Cubemap Loader** node, which enables the generation of 3D environment maps from Street View locations. This node fetches six images at specific orientations to create a complete cubemap suitable for 3D applications and environment mapping in game engines or rendering software.
 
+![Street View Cubemap Loader Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/Streetview_cubemap_cross.png)
 
-![Street View Cubemap Loader Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/StreetView_cubemap.png)
+![Street View Cubemap Merged Hstrip Loader Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/Streetview_cubemap_hstrip.png)
+
+![Street View Cubemap Merged Hstrip Loader Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/Streetview_cubemap_vstrip.png)
 
 ### How to Use & Parameter Suggestions
 
@@ -228,10 +231,6 @@ Version 1.02 introduces the **Street View Cubemap Loader** node, which enables t
         -   **Up**: The view looking upward from the location (0° heading, 85° pitch) - note slightly less than 90° to work with API limitations
         -   **Down**: The view looking downward from the location (0° heading, -85° pitch) - note slightly less than -90° to work with API limitations
     -   **Merged texture** (when selected): A single image tensor containing all six faces arranged according to the selected layout
-
-![Street View Cubemap Merged Hstrip Loader Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/StreetView_cubemap-Hstrip.png)
-
-![Street View Cubemap Merged Hstrip Loader Node in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/StreetView_cubemap-Vstrip.png)
 
 ### Use Cases for Cubemap Output
 
