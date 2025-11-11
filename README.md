@@ -110,7 +110,7 @@ The recommended workflow is to use the **URL Parser** node to feed information i
 
 This node takes a full Google Maps URL as input and outputs the camera parameters (`location`, `heading`, `pitch`, `fov`).
 
-**`Street View Loader`**
+## Street View Loader
 This is the main node that fetches the image.
 -   **`aspect_ratio`**: Choose your desired output aspect ratio from the dropdown. This replaces manual width/height inputs.
 -   **API Limit & Upscaling:** The Google Street View API has a maximum output size of **640x640 pixels**. For high-resolution images (like 1080p or 4K), you **must** use an upscaling workflow.
