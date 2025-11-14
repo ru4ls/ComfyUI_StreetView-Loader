@@ -29,7 +29,13 @@ This gives you the best of both worlds: the authenticity of a real photograph co
 *   **Consistent Backgrounds for Testing:** Use a consistent, real-world background to reliably test LoRAs, IPAdapters, or character models.
 *   **Animation Capabilities:** Create smooth camera movements and parameter transitions with the new Street View Animator node (v1.01).
 
+*example using nano-banana to re-context the output image
+
 ![Street View Loader Node combine with NanoBanana in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/preview_2.png)
+
+*example using the output as a set of input for first and last frame vlm workflow to create a walk-through video
+
+https://github.com/user-attachments/assets/63f26d92-4ef3-4403-b5cf-82189c61ffec
 
 ## Features
 - **Direct API Integration:** Pulls images directly from the Google Street View Static API.
