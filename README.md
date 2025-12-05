@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
-[![Version: v1.01](https://img.shields.io/badge/Version-v1.01-green.svg)](https://github.com/ru4ls/ComfyUI_StreetView-Loader)
+[![Version: v1.0.3](https://img.shields.io/badge/Version-v1.0.3-green.svg)](https://github.com/ru4ls/ComfyUI_StreetView-Loader)
 
 A custom node for ComfyUI that allows you to load images directly from Google Street View to use as backgrounds, textures, or inputs in your workflows. Version 1.01 adds animation capabilities!
 
@@ -27,7 +27,7 @@ This gives you the best of both worlds: the authenticity of a real photograph co
 *   **Virtual Location Scouting:** Instantly scout real-world locations from your desktop and experiment with different styles and moods for your project.
 *   **Personalized & Sentimental Art:** Create unique art based on a place with personal meaning—a childhood home, a proposal spot, or a favorite vacation view.
 *   **Consistent Backgrounds for Testing:** Use a consistent, real-world background to reliably test LoRAs, IPAdapters, or character models.
-*   **Animation Capabilities:** Create smooth camera movements and parameter transitions with the new Street View Animator node (v1.01).
+*   **Animation Capabilities:** Create smooth camera movements and parameter transitions with the new Street View Animator node (v1.0.1).
 
 *example using nano-banana to re-context the output image
 
@@ -44,8 +44,9 @@ https://github.com/user-attachments/assets/63f26d92-4ef3-4403-b5cf-82189c61ffec
 -   **Simple Aspect Ratio Presets:** Choose from common ratios like 16:9 or 1:1 without manual calculations.
 - **Clean Output:** No UI overlays, just the pure image.
 - **Panorama Mode:** Stitch multiple images together to create ultra-wide cinematic landscapes.
-- **(New in v1.01) Animation Mode:** Animate camera parameters over time to create smooth transitions and camera movements.
-- **(New in v1.02) Cubemap Mode:** Generate 3D environment maps with six images representing all directions (front, back, left, right, up, down) for use in 3D applications and game engines.
+- **(New in v1.0.1) Animation Mode:** Animate camera parameters over time to create smooth transitions and camera movements.
+- **(New in v1.0.2) Cubemap Mode:** Generate 3D environment maps with six images representing all directions (front, back, left, right, up, down) for use in 3D applications and game engines.
+- **(New in v1.0.3) Historical Date Support:** Load images from specific historical dates using panorama IDs. All loader nodes now support historical image retrieval by providing a historical date ID.
 
 ---
 
@@ -114,7 +115,9 @@ The recommended workflow is to use the **URL Parser** node to feed information i
 
 ## Street View URL Parser
 
-This node takes a full Google Maps URL as input and outputs the camera parameters (`location`, `heading`, `pitch`, `fov`).
+This node takes a full Google Maps URL as input and outputs the camera parameters (`location`, `heading`, `pitch`, `fov`, `historical_date_id`).
+
+The `historical_date_id` parameter represents the panorama ID that can be used to access historical Street View imagery from specific dates in the past.
 
 ## Street View Loader
 This is the main node that fetches the image.
@@ -124,6 +127,7 @@ This is the main node that fetches the image.
     1.  Select `"16:9 Widescreen (640x360)"` in the `Street View Loader`.
     2.  Connect its `IMAGE` output to an **`Upscale Image (using model)`** node.
     3.  Use a `Load Upscale Model` node (e.g., `4x-UltraSharp`) to get a final, high-quality **2560x1440** image.
+-   **Historical Date Support (v1.0.3):** Provides an optional `historical_date_id` input parameter. When provided, this parameter overrides the location and fetches a historical image from the specified date, allowing you to access Street View imagery from previous years. To obtain a historical date ID, use the Street View URL Parser (see below) or extract it from a Google Maps URL.
 
 ## Street View Pano Loader
 
@@ -255,6 +259,44 @@ https://github.com/user-attachments/assets/8f9b3771-ee5d-449a-97fe-b884d33b950b
 - **API Limitations**: The Street View API might not return valid images for extreme pitch angles. The node uses 85° and -85° for the up and down faces to avoid common API limitations at exactly 90° vertical pitch.
 - **Resolution Constraints**: Each face will be limited by the Street View API's maximum output size of 640x640 pixels. For higher resolutions, you'll need to upscale the results using ComfyUI's upscaling nodes after generation.
 - **Memory Considerations**: The merged output modes will create larger textures (e.g., cross layout is 4x width by 3x height of individual faces) so consider your system's memory limitations when choosing high resolutions.
+
+## New Feature: Historical Date Support (v1.0.3)
+
+Version 1.0.3 introduces the ability to load historical Street View images by using panorama IDs (historical date IDs). This feature allows you to access Street View imagery from specific dates in the past, enabling comparison of locations over time or creating content based on historical views.
+
+### How to Obtain Historical Date IDs
+
+1.  **Find Your Location in Google Maps:** Navigate to the location you want to view historically.
+2.  **Enter Street View Mode:** Click on the Street View icon (orange person) and drag it to the location.
+3.  **Navigate to Historical Imagery:** Click on the clock icon in the top left of the Street View panel to see available historical dates.
+4.  **Select a Date:** Choose a specific date from the timeline to view the historical imagery.
+5.  **Extract the URL:** Copy the complete URL from your browser's address bar after selecting the historical date.
+6.  **Use the URL Parser:** Pass this URL to the **Street View URL Parser** node, which will extract the historical date ID along with the other parameters.
+
+### Using Historical Date IDs in Nodes
+
+All loader nodes (Street View Loader, Street View Animator, Street View Pano Loader, Street View Cubemap Loader) now include an optional `historical_date_id` parameter. When this parameter is provided:
+
+- **Location Override:** The historical date ID takes precedence over the location parameter, ensuring you get imagery from that specific historical capture
+- **Full Parameter Control:** You can still adjust heading, pitch, fov, and other parameters to control the view of the historical scene
+- **Historical Animation:** The Street View Animator node allows you to create smooth camera movements on historical scenes
+- **Historical Panoramas:** The Street View Pano Loader creates historical panoramic views
+- **Historical Cubemaps:** The Street View Cubemap Loader creates 3D historical environment maps
+
+### Use Cases for Historical Imagery
+
+- **Before and After Comparisons:** Compare how locations have changed over time
+- **Historical Context:** Create content showing specific events or changes at locations
+- **Time Travel Effects:** Blend historical imagery with AI generated content
+- **Research and Documentation:** Access historical views for architectural or geographical studies
+- **Creative Projects:** Generate artistic content based on historical locations
+
+### Important Notes about Historical Imagery
+
+- **API Behavior:** When a historical date ID is provided, the API returns the view from that specific capture, regardless of the current date imagery
+- **Available Dates:** Historical coverage varies by location - not all locations have historical imagery available
+- **Image Quality:** Historical images may have different resolution or quality depending on when they were captured
+- **API Usage:** Historical requests count the same as current date requests against your Google Cloud monthly credit
 
 ### Important Notes for All Nodes
 

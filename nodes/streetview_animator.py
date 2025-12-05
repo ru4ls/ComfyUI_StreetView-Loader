@@ -27,7 +27,7 @@ class StreetViewAnimator:
     A ComfyUI node to animate StreetView parameters (heading, pitch, fov) over time,
     generating a sequence of images based on duration and FPS settings.
     """
-    
+
     @classmethod
     def INPUT_TYPES(s):
         """
@@ -37,7 +37,7 @@ class StreetViewAnimator:
         return {
             "required": {
                 "location": ("STRING", {
-                    "multiline": False, 
+                    "multiline": False,
                     "default": "40.720032,-73.988354" # Example: Near Katz's Deli, NYC
                 }),
                 # Start values for animation
@@ -50,8 +50,8 @@ class StreetViewAnimator:
                 "duration": ("FLOAT", {"default": 5.0, "min": 0.1, "max": 60.0, "step": 0.1, "display": "slider"}),
                 "fps": ("INT", {"default": 24, "min": 1, "max": 60, "step": 1, "display": "slider"}),
                 "aspect_ratio": ([
-                    "1:1 Square (640x640)", 
-                    "16:9 Widescreen (640x360)", 
+                    "1:1 Square (640x640)",
+                    "16:9 Widescreen (640x360)",
                     "9:16 Vertical (360x640)",
                     "4:3 Classic (640x480)",
                     "3:2 Photography (640x427)"
@@ -62,13 +62,17 @@ class StreetViewAnimator:
                     "ease_out", # Fast start, decelerate
                     "ease_in_out" # Slow start, fast middle, slow end
                 ], {"default": "linear"}),
+            },
+            # NEW: Optional input for Historical Date ID (Panorama ID)
+            "optional": {
+                "historical_date_id": ("STRING", {"default": "", "multiline": False, "tooltip": "Enter a panorama ID to animate a historical image from a specific date"}),
             }
         }
 
     RETURN_TYPES = ("IMAGE", "STRING")
     RETURN_NAMES = ("images", "metadata")
     FUNCTION = "animate_streetview"
-    CATEGORY = "Ru4ls/StreetView/Animation"
+    CATEGORY = "Ru4ls/StreetView"
 
     def linear_interpolation(self, start_val, end_val, progress):
         """Linear interpolation between two values."""
@@ -89,7 +93,7 @@ class StreetViewAnimator:
         else:
             return start_val + (end_val - start_val) * (1 - (-2 * progress + 2) ** 2 / 2)
 
-    def animate_streetview(self, location, start_heading, end_heading, start_pitch, end_pitch, start_fov, end_fov, duration, fps, aspect_ratio, interpolation):
+    def animate_streetview(self, location, start_heading, end_heading, start_pitch, end_pitch, start_fov, end_fov, duration, fps, aspect_ratio, interpolation, historical_date_id=""):
         if not API_KEY_FROM_ENV:
             raise ValueError("Google Street View API key not found in .env file. Please ensure GOOGLE_STREET_VIEW_API_KEY is set in ComfyUI_StreetView-Loader/.env")
 
@@ -125,12 +129,12 @@ class StreetViewAnimator:
         image_tensors = []
         for frame in range(total_frames):
             progress = frame / (total_frames - 1) if total_frames > 1 else 0.0
-            
+
             # Interpolate parameters based on progress
             current_heading = interp_func(start_heading, end_heading, progress)
             current_pitch = interp_func(start_pitch, end_pitch, progress)
             current_fov = int(interp_func(start_fov, end_fov, progress))
-            
+
             # Ensure fov is within valid range
             current_fov = max(10, min(120, current_fov))
 
@@ -150,6 +154,7 @@ class StreetViewAnimator:
             image_pil, metadata = fetch_streetview_image(
                 api_key=API_KEY_FROM_ENV,
                 location=location,
+                pano_id=historical_date_id,  # Pass the historical date ID if provided
                 heading=current_heading,
                 pitch=current_pitch,
                 fov=current_fov,

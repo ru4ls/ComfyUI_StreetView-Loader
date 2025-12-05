@@ -4,7 +4,7 @@ import requests
 from PIL import Image
 from io import BytesIO
 
-def fetch_streetview_image(api_key, location, heading, pitch, fov, width, height):
+def fetch_streetview_image(api_key, location, heading, pitch, fov, width, height, pano_id=""):
     """
     Connects to the Google Street View API and fetches an image.
 
@@ -13,16 +13,22 @@ def fetch_streetview_image(api_key, location, heading, pitch, fov, width, height
         or (error_image, error_message_string) on failure.
     """
     base_url = "https://maps.googleapis.com/maps/api/streetview"
-    
+
     params = {
         "size": f"{width}x{height}",
-        "location": location,
         "heading": heading,
         "pitch": pitch,
         "fov": fov,
         "key": api_key,
         "return_error_codes": "true"
     }
+
+    # CRITICAL LOGIC:
+    # If a Pano ID is provided, use it. It overrides the location.
+    if pano_id and pano_id.strip() != "":
+        params["pano"] = pano_id
+    else:
+        params["location"] = location
 
     try:
         response = requests.get(base_url, params=params, timeout=20)

@@ -32,18 +32,22 @@ class StreetViewCubemapLoader:
                     "256x256", "512x512", "640x640", "1024x1024"
                 ], {"default": "512x512"}),
                 "output_mode": ([
-                    "individual_faces", 
-                    "merged_cross", 
-                    "merged_hstrip", 
+                    "individual_faces",
+                    "merged_cross",
+                    "merged_hstrip",
                     "merged_vstrip"
                 ], {"default": "merged_cross"}),
+            },
+            # NEW: Optional input for Historical Date ID (Panorama ID)
+            "optional": {
+                "historical_date_id": ("STRING", {"default": "", "multiline": False, "tooltip": "Enter a panorama ID to load a historical cubemap from a specific date"}),
             }
         }
 
     RETURN_TYPES = ("IMAGE", "IMAGE", "IMAGE", "IMAGE", "IMAGE", "IMAGE", "IMAGE", "STRING")
     RETURN_NAMES = ("front", "back", "left", "right", "up", "down", "merged_cubemap", "metadata")
     FUNCTION = "load_cubemap"
-    CATEGORY = "Ru4ls/StreetView/Environment"
+    CATEGORY = "Ru4ls/StreetView"
 
     def pil_to_tensor(self, image: Image.Image):
         image_np = np.array(image).astype(np.float32) / 255.0
@@ -56,21 +60,21 @@ class StreetViewCubemapLoader:
         """
         # Convert to numpy array
         img_array = np.array(image)
-        
+
         # Check if it's mostly black (typical for failed API requests)
         # If more than 90% of pixels are very dark, consider it invalid
         dark_pixels = np.sum(img_array < 30)  # pixels with values under 30/255
         total_pixels = img_array.size
-        
+
         # If more than 90% of pixels are very dark, it's likely a failed request
         if dark_pixels / total_pixels > 0.9:
             return False
-            
+
         # Also check if the image is filled with a uniform color (another failure indicator)
         # Calculate the standard deviation of pixel values; low std indicates uniform color
         if np.std(img_array) < 5:  # If standard deviation is very low, it's likely a uniform color
             return False
-            
+
         return True
 
     def create_merged_cubemap(self, face_images, output_mode):
@@ -89,29 +93,29 @@ class StreetViewCubemapLoader:
             # Cross layout: 3 columns x 4 rows, with the side faces in the middle row
             cross_width = 4 * width
             cross_height = 3 * height
-            
+
             merged_image = Image.new('RGB', (cross_width, cross_height), (0, 0, 0))
-            
+
             # Place faces in cross layout
             # Up face at top center (column 1, row 0)
             merged_image.paste(face_images["up"], (width, 0))
-            
+
             # Middle row: left, front, right, back
             merged_image.paste(face_images["left"], (0, height))
             merged_image.paste(face_images["front"], (width, height))
             merged_image.paste(face_images["right"], (width * 2, height))
             merged_image.paste(face_images["back"], (width * 3, height))
-            
+
             # Down face at bottom center (column 1, row 2)
             merged_image.paste(face_images["down"], (width, height * 2))
-            
+
         elif output_mode == "merged_hstrip":
             # Horizontal strip layout: all 6 faces in a single row
             strip_width = 6 * width
             strip_height = height
-            
+
             merged_image = Image.new('RGB', (strip_width, strip_height), (0, 0, 0))
-            
+
             # Order: right, left, up, down, front, back (common for some 3D engines)
             merged_image.paste(face_images["right"], (0, 0))  # Right
             merged_image.paste(face_images["left"], (width, 0))  # Left
@@ -119,14 +123,14 @@ class StreetViewCubemapLoader:
             merged_image.paste(face_images["down"], (3 * width, 0))  # Down
             merged_image.paste(face_images["front"], (4 * width, 0))  # Front
             merged_image.paste(face_images["back"], (5 * width, 0))  # Back
-            
+
         elif output_mode == "merged_vstrip":
             # Vertical strip layout: all 6 faces in a single column
             strip_width = width
             strip_height = 6 * height
-            
+
             merged_image = Image.new('RGB', (strip_width, strip_height), (0, 0, 0))
-            
+
             # Order: right, left, up, down, front, back
             merged_image.paste(face_images["right"], (0, 0))  # Right
             merged_image.paste(face_images["left"], (0, height))  # Left
@@ -134,14 +138,14 @@ class StreetViewCubemapLoader:
             merged_image.paste(face_images["down"], (0, 3 * height))  # Down
             merged_image.paste(face_images["front"], (0, 4 * height))  # Front
             merged_image.paste(face_images["back"], (0, 5 * height))  # Back
-            
+
         else:
             # Default to individual faces if mode is invalid
             return None
-            
+
         return merged_image
 
-    def load_cubemap(self, location, face_resolution, output_mode):
+    def load_cubemap(self, location, face_resolution, output_mode, historical_date_id=""):
         if not API_KEY_FROM_ENV:
             raise ValueError("Google Street View API key not found in .env file.")
 
@@ -163,7 +167,7 @@ class StreetViewCubemapLoader:
         # so we use near-vertical values that are more likely to succeed while maintaining 90° FOV
         face_orientations = {
             "front": (0, 0),       # Facing forward
-            "back": (180, 0),      # Facing backward  
+            "back": (180, 0),      # Facing backward
             "left": (270, 0),      # Facing left
             "right": (90, 0),      # Facing right
             "up": (0, 90),         # Looking up (with 90° FOV - may fail but geometrically correct)
@@ -175,15 +179,22 @@ class StreetViewCubemapLoader:
         successful_fetches = 0
 
         print(f"StreetView Cubemap: Fetching 6 images for cubemap faces at resolution {width}x{height}.")
-        
+
         # Fetch each face of the cubemap using 90° FOV for all faces (optimal for cubemap geometry)
         for face_name, (heading, pitch) in face_orientations.items():
             print(f"  - Fetching {face_name} face at heading {heading}°, pitch {pitch}°, fov 90°...")
             try:
                 image_pil, metadata_url = fetch_streetview_image(
-                    API_KEY_FROM_ENV, location, heading, pitch, 90, width, height  # Always use 90° FOV for proper cubemap geometry
+                    api_key=API_KEY_FROM_ENV,
+                    location=location,
+                    pano_id=historical_date_id,  # Pass the historical date ID if provided
+                    heading=heading,
+                    pitch=pitch,
+                    fov=90,  # Always use 90° FOV for proper cubemap geometry
+                    width=width,
+                    height=height
                 )
-                
+
                 # Check if the image is valid (not all black, which often indicates API failure at extreme angles)
                 if image_pil and self.is_valid_image(image_pil):
                     face_images[face_name] = image_pil
@@ -194,9 +205,16 @@ class StreetViewCubemapLoader:
                     if face_name in ["up", "down"]:
                         fallback_pitch = 85 if face_name == "up" else -85
                         print(f"  - {face_name} face failed with {pitch}° pitch, trying {fallback_pitch}°...")
-                        
+
                         fallback_image, fallback_metadata_url = fetch_streetview_image(
-                            API_KEY_FROM_ENV, location, heading, fallback_pitch, 90, width, height
+                            api_key=API_KEY_FROM_ENV,
+                            location=location,
+                            pano_id=historical_date_id,  # Pass the historical date ID if provided
+                            heading=heading,
+                            pitch=fallback_pitch,
+                            fov=90,  # Always use 90° FOV for proper cubemap geometry
+                            width=width,
+                            height=height
                         )
                         
                         if fallback_image and self.is_valid_image(fallback_image):
