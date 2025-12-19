@@ -33,7 +33,7 @@ This gives you the best of both worlds: the authenticity of a real photograph co
 
 ![Street View Loader Node combine with NanoBanana in ComfyUI](https://github.com/ru4ls/ru4ls-public-media/blob/main/comfyui-streetview-loader/images/preview_2.png)
 
-*example using the output as a set of input for first and last frame vlm workflow to create a walk-through video
+*example using the output as a set of input for first and last frame video diffusion workflow to create a walk-through video
 
 https://github.com/user-attachments/assets/63f26d92-4ef3-4403-b5cf-82189c61ffec
 
