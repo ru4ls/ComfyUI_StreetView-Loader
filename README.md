@@ -264,6 +264,14 @@ https://github.com/user-attachments/assets/8f9b3771-ee5d-449a-97fe-b884d33b950b
 
 Version 1.0.3 introduces the ability to load historical Street View images by using panorama IDs (historical date IDs). This feature allows you to access Street View imagery from specific dates in the past, enabling comparison of locations over time or creating content based on historical views.
 
+<img width="1919" height="1032" alt="Screenshot 2025-12-19 122335" src="https://github.com/user-attachments/assets/84f822e7-face-4392-8413-5c9555da5f52" />
+
+Current date 2025
+<img width="640" height="640" alt="StreetView_2025_00001_" src="https://github.com/user-attachments/assets/89d50b59-318d-46f9-9239-161b61bcf77e" />
+
+Previous date 2021
+<img width="640" height="640" alt="StreetView_2021_00001_" src="https://github.com/user-attachments/assets/d4bf82e5-c361-4a2e-91d3-aac034362f4a" />
+
 ### How to Obtain Historical Date IDs
 
 1.  **Find Your Location in Google Maps:** Navigate to the location you want to view historically.
