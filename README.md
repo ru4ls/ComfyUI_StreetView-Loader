@@ -2,9 +2,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
-[![Version: v1.0.3](https://img.shields.io/badge/Version-v1.0.3-green.svg)](https://github.com/ru4ls/ComfyUI_StreetView-Loader)
+[![Version: v1.0.4](https://img.shields.io/badge/Version-v1.0.4-green.svg)](https://github.com/ru4ls/ComfyUI_StreetView-Loader)
 
-A custom node for ComfyUI that allows you to load images directly from Google Street View to use as backgrounds, textures, or inputs in your workflows. Version 1.01 adds animation capabilities!
+A custom node for ComfyUI that allows you to load images directly from Google Street View to use as backgrounds, textures, or inputs in your workflows. Version 1.01 adds animation capabilities, v1.0.2 adds cubemap generation, v1.0.3 adds historical date support, and v1.0.4 adds equirectangular panorama generation!
 
 Instead of manually taking screenshots, this node programmatically fetches a clean, high-resolution image from any location on Earth with Street View coverage, giving you precise control over the camera angle, direction, and field of view.
 
@@ -47,6 +47,7 @@ https://github.com/user-attachments/assets/63f26d92-4ef3-4403-b5cf-82189c61ffec
 - **(New in v1.0.1) Animation Mode:** Animate camera parameters over time to create smooth transitions and camera movements.
 - **(New in v1.0.2) Cubemap Mode:** Generate 3D environment maps with six images representing all directions (front, back, left, right, up, down) for use in 3D applications and game engines.
 - **(New in v1.0.3) Historical Date Support:** Load images from specific historical dates using panorama IDs. All loader nodes now support historical image retrieval by providing a historical date ID.
+- **(New in v1.0.4) Equirectangular Mode:** Generate 360°x180° panoramic images from six cube faces for VR applications, environment mapping, and immersive experiences with optional upscaling for enhanced quality.
 
 ---
 
@@ -260,6 +261,60 @@ https://github.com/user-attachments/assets/8f9b3771-ee5d-449a-97fe-b884d33b950b
 - **Resolution Constraints**: Each face will be limited by the Street View API's maximum output size of 640x640 pixels. For higher resolutions, you'll need to upscale the results using ComfyUI's upscaling nodes after generation.
 - **Memory Considerations**: The merged output modes will create larger textures (e.g., cross layout is 4x width by 3x height of individual faces) so consider your system's memory limitations when choosing high resolutions.
 
+## Street View Equirectangular Loader (v1.0.4)
+
+Version 1.0.4 introduces the **Street View Equirectangular Loader** node, which creates full 360°x180° panoramic images by combining six individual Street View captures (front, back, left, right, top, bottom) into a single equirectangular projection. This format is ideal for VR applications, environment mapping, and immersive experiences.
+
+### How to Use & Parameter Suggestions
+
+1.  Add the **"Street View Equirectangular Loader"** node to your canvas.
+2.  Provide a `location` (same as other nodes) for the center point of your panoramic capture.
+3.  Adjust the parameters as needed:
+    -   **`face_resolution`**: Select the resolution for each of the 6 source cubemap faces. Options include 256x256, 512x512, and 640x640. Higher resolutions provide better quality but require more API requests and resources.
+    -   **`upscale_factor`**: Choose a factor (1-4) to upscale the source images before equirectangular conversion. This significantly improves output quality by working with higher-resolution source material. Factor 2x will double the resolution of each face (e.g., from 640x640 to 1280x1280).
+    -   **`upscale_method`**: Select the resampling algorithm for upscaling. Options are "LANCZOS" (highest quality, slower), "BICUBIC" (good quality, medium speed), "BILINEAR" (medium quality, faster), or "NEAREST" (lower quality, fastest). LANCZOS is recommended for best results.
+    -   **`interpolation_mode`**: Select the interpolation method for pixel sampling during the equirectangular conversion. Options are "BILINEAR" (smoother) or "NEAREST" (sharper but potentially more aliased).
+
+4.  The node will generate multiple outputs:
+    -   **`equirectangular_image`**: The main output - a single 360°x180° panoramic image in equirectangular projection
+    -   **`front`, `back`, `left`, `right`, `top`, `bottom`**: Individual cube face images after any necessary transformations and upscaling
+    -   **`metadata`**: Information about the generation process, including successful fetches and API usage
+
+### Use Cases for Equirectangular Output
+
+- **VR Applications:** Create immersive virtual reality environments from real-world locations
+- **360° Panoramic Views:** Generate full spherical panoramas for virtual tours or real estate
+- **Environment Mapping:** Use as environment maps for 3D rendering and lighting calculations
+- **Immersive Experiences:** Integrate into VR/AR applications or 360° video projects
+- **Architectural Visualization:** Capture and present real-world spaces in spherical format
+- **Game Development:** Create authentic environment maps for game engines
+
+### Technical Details
+
+- **Conversion Process:** The node fetches six individual Street View images at specific orientations (every 90°) and mathematically converts them to equirectangular projection
+- **Face Orientations:**
+  - Front: 0° heading, 0° pitch
+  - Back: 180° heading, 0° pitch
+  - Left: 270° heading, 0° pitch
+  - Right: 90° heading, 0° pitch
+  - Top: 0° heading, 90° pitch
+  - Bottom: 0° heading, -90° pitch
+- **Quality Enhancement:** The upscale factor allows working with higher-resolution source images to minimize quality loss during the geometric transformation
+- **Optimized Conversion:** Uses vectorized numpy operations for efficient equirectangular projection conversion
+
+### Important Notes
+
+- **API Usage:** This node makes six API calls (one for each face of the cube). Each equirectangular generation will count as **6 requests** against your free monthly Google Cloud credit.
+- **Processing Time:** The equirectangular conversion involves complex mathematical transformations and may take longer than other nodes, especially with higher resolution and upscale factors.
+- **Memory Considerations:** Higher resolution faces and upscale factors will require more memory during processing.
+- **Historical Support:** Like other nodes, this supports the optional `historical_date_id` parameter to generate equirectangular panoramas from historical Street View captures.
+
+### Important Notes for All Nodes
+
+-   **API Usage:** All nodes make API requests against your Google Cloud monthly credit.
+-   **API Limitations:** The Street View API may not have coverage for all locations or may return black images for extreme angles or unavailable locations.
+-   **Resolution Constraints:** The maximum resolution from the API is 640x640 pixels per image. For higher-resolution results, use ComfyUI's upscaling nodes.
+
 ## New Feature: Historical Date Support (v1.0.3)
 
 Version 1.0.3 introduces the ability to load historical Street View images by using panorama IDs (historical date IDs). This feature allows you to access Street View imagery from specific dates in the past, enabling comparison of locations over time or creating content based on historical views.
@@ -305,13 +360,6 @@ All loader nodes (Street View Loader, Street View Animator, Street View Pano Loa
 - **Available Dates:** Historical coverage varies by location - not all locations have historical imagery available
 - **Image Quality:** Historical images may have different resolution or quality depending on when they were captured
 - **API Usage:** Historical requests count the same as current date requests against your Google Cloud monthly credit
-
-### Important Notes for All Nodes
-
--   **API Usage:** All nodes make API requests against your Google Cloud monthly credit.
--   **API Limitations:** The Street View API may not have coverage for all locations or may return black images for extreme angles or unavailable locations.
--   **Resolution Constraints:** The maximum resolution from the API is 640x640 pixels per image. For higher-resolution results, use ComfyUI's upscaling nodes.
-
 
 ## 7. Troubleshooting
 

@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-streetview-loader"
-description = "A custom node for ComfyUI that allows you to load images directly from Google Street View using Google Street Static API to use as backgrounds, textures, or inputs in your workflows. (v1.0.1) Add StreetView Animate. (v1.0.2) Add StreetView Cubemap. (v1.0.3) Add historical date feature for all nodes. Please check repo for API and setup guide."
-version = "1.0.3"
+description = "A custom node for ComfyUI that allows you to load images directly from Google Street View using Google Street Static API to use as backgrounds, textures, or inputs in your workflows. (v1.0.1) Add StreetView Animate. (v1.0.2) Add StreetView Cubemap. (v1.0.3) Add historical date feature for all nodes. (v1.0.4) Add StreetView Equirectangular.Please check repo for API and setup guide."
+version = "1.0.4"
 license = {file = "LICENSE"} 
 # classifiers = [
 #     # For OS-independent nodes (works on all operating systems)
