@@ -265,6 +265,8 @@ https://github.com/user-attachments/assets/8f9b3771-ee5d-449a-97fe-b884d33b950b
 
 Version 1.0.4 introduces the **Street View Equirectangular Loader** node, which creates full 360°x180° panoramic images by combining six individual Street View captures (front, back, left, right, top, bottom) into a single equirectangular projection. This format is ideal for VR applications, environment mapping, and immersive experiences.
 
+<img width="1803" height="532" alt="Screenshot 2026-01-11 153535" src="https://github.com/user-attachments/assets/56cd8242-55cf-4be6-a5ad-c5b34eff832d" />
+
 ### How to Use & Parameter Suggestions
 
 1.  Add the **"Street View Equirectangular Loader"** node to your canvas.
